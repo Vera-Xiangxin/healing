@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>登录 & 注册 - 治愈维拉</title>
+	<!-- 字体与图标 -->
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<style>
+		* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+        }
+        body {
+            background: linear-gradient(to bottom, #ffffff, #aaffff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        /* 主容器 */
+        .container {
+            width: 900px;
+            height: 500px;
+            background-color: azure;
+            border-radius: 12px;
+            display: flex;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .left-img {
+            width: 50%;
+            height: 100%;
+        }
+        .left-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .right-login {
+            width: 50%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 40px;
+        }
+        .login-card {
+            width: 100%;
+        }
+        .login-title {
+            text-align: center;
+            font-size: 26px;
+            font-weight: 600;
+            color: #25345c;
+            margin-bottom: 28px;
+        }
+        .input-box {
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.4rem;
+            margin-bottom: 1.2rem;
+            gap: 0.8rem;
+            transition: 0.2s;
+        }
+        .input-box.user-input {
+            background: #ffffff;
+            border: 2px solid #e8edf9;
+        }
+        .input-box.user-input:focus-within {
+            border-color: #6994ff;
+        }
+        .input-box.pwd-input {
+            background: #f1f4f9;
+            border: 2px solid transparent;
+        }
+        .input-box i {
+            font-size: 1.3rem;
+            color: #94a3bc;
+        }
+        .input-box input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 1rem;
+            color: #222;
+        }
+        .pwd-toggle {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+        .row-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.2rem;
+            font-size: 0.95rem;
+        }
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #444;
+            cursor: pointer;
+        }
+        .forget-pwd {
+            color: #4f7df3;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .login-btn {
+            width: 100%;
+            border: none;
+            background: #25345c;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: 0.2s;
+        }
+        .login-btn:hover {
+            opacity: 0.92;
+        }
+        .bottom-signup {
+            text-align: center;
+            margin-top: 1.8rem;
+            font-size: 0.95rem;
+            color: #667490;
+        }
+        .bottom-signup a {
+            color: #4f7df3;
+            font-weight: 600;
+            text-decoration: none;
+            margin-left: 0.3rem;
+            cursor: pointer;
+        }
+
+        /* 注册模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: #fff;
+            width: 400px;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .modal-content h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #25345c;
+        }
+        .modal-content .input-box {
+            margin-bottom: 20px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .modal-buttons button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 30px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-buttons .confirm {
+            background: #25345c;
+            color: white;
+        }
+        .modal-buttons .cancel {
+            background: #e0e0e0;
+            color: #333;
+        }
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        .close-modal:hover {
+            color: #333;
+        }
+	</style>
+</head>
+<body>
+
+<div class="container">
+	<div class="left-img">
+		<img src="src/images/猫.jpg" alt="治愈插画">
+	</div>
+	<div class="right-login">
+		<div class="login-card">
+			<h2 class="login-title">欢迎登录</h2>
+			<div class="input-box user-input">
+				<i class="far fa-envelope"></i>
+				<input type="text" id="loginUsername" placeholder="用户名 / 邮箱">
+			</div>
+			<div class="input-box pwd-input">
+				<i class="fas fa-lock"></i>
+				<input type="password" id="loginPassword" placeholder="密码">
+				<button class="pwd-toggle" id="togglePasswordBtn">
+					<i class="fas fa-eye-slash"></i>
+				</button>
+			</div>
+			<div class="row-group">
+				<label class="remember-me">
+					<input type="checkbox"> 记住我
+				</label>
+				<a href="#" class="forget-pwd">忘记密码?</a>
+			</div>
+			<button class="login-btn" id="loginBtn">
+				登录 <i class="fas fa-arrow-right"></i>
+			</button>
+			<div class="bottom-signup">
+				还没有账号? <a id="registerLink">立即注册</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- 注册模态框 -->
+<div id="registerModal" class="modal">
+	<div class="modal-content">
+		<span class="close-modal" id="closeModalBtn">&times;</span>
+		<h3>注册新账号</h3>
+		<div class="input-box user-input">
+			<i class="far fa-envelope"></i>
+			<input type="text" id="regUsername" placeholder="用户名">
+		</div>
+		<div class="input-box pwd-input">
+			<i class="fas fa-lock"></i>
+			<input type="password" id="regPassword" placeholder="密码">
+			<button class="pwd-toggle" id="toggleRegPwdBtn">
+				<i class="fas fa-eye-slash"></i>
+			</button>
+		</div>
+		<div class="input-box pwd-input">
+			<i class="fas fa-lock"></i>
+			<input type="password" id="regConfirmPassword" placeholder="确认密码">
+			<button class="pwd-toggle" id="toggleRegConfirmBtn">
+				<i class="fas fa-eye-slash"></i>
+			</button>
+		</div>
+		<div class="modal-buttons">
+			<button class="confirm" id="confirmRegisterBtn">注册</button>
+			<button class="cancel" id="cancelRegisterBtn">取消</button>
+		</div>
+	</div>
+</div>
+
+<script>
+	// ---- 密码显示/隐藏 (登录框) ----
+    const togglePwdBtn = document.getElementById('togglePasswordBtn');
+    const loginPwd = document.getElementById('loginPassword');
+    const pwdIcon = togglePwdBtn.querySelector('i');
+    togglePwdBtn.addEventListener('click', () => {
+        const isPwd = loginPwd.type === 'password';
+        loginPwd.type = isPwd ? 'text' : 'password';
+        pwdIcon.className = isPwd ? 'fas fa-eye' : 'fas fa-eye-slash';
+    });
+
+    // 注册模态框内的密码显示切换
+    const regPwd = document.getElementById('regPassword');
+    const toggleRegPwd = document.getElementById('toggleRegPwdBtn');
+    const regPwdIcon = toggleRegPwd.querySelector('i');
+    toggleRegPwd.addEventListener('click', () => {
+        const isPwd = regPwd.type === 'password';
+        regPwd.type = isPwd ? 'text' : 'password';
+        regPwdIcon.className = isPwd ? 'fas fa-eye' : 'fas fa-eye-slash';
+    });
+    const regConfirmPwd = document.getElementById('regConfirmPassword');
+    const toggleRegConfirm = document.getElementById('toggleRegConfirmBtn');
+    const regConfirmIcon = toggleRegConfirm.querySelector('i');
+    toggleRegConfirm.addEventListener('click', () => {
+        const isPwd = regConfirmPwd.type === 'password';
+        regConfirmPwd.type = isPwd ? 'text' : 'password';
+        regConfirmIcon.className = isPwd ? 'fas fa-eye' : 'fas fa-eye-slash';
+    });
+
+    // ---- 登录逻辑 ----
+    const loginBtn = document.getElementById('loginBtn');
+    const usernameInput = document.getElementById('loginUsername');
+    const passwordInput = document.getElementById('loginPassword');
+
+    async function doLogin() {
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
+        if (!username || !password) {
+            alert('请输入用户名和密码');
+            return;
+        }
+        try {
+            const response = await fetch('http://localhost:8080/api/user/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ username, password })
+            });
+            const data = await response.json();
+            if (data.success) {
+                localStorage.setItem('userId', data.userId);
+                window.location.href = 'zy.html';
+            } else {
+                alert(data.message || '用户名或密码错误');
+            }
+        } catch (err) {
+            console.error('登录请求失败:', err);
+            alert('无法连接服务器，请确保后端已启动（端口8080）');
+        }
+    }
+
+    loginBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        doLogin();
+    });
+    // 回车登录
+    const handleEnterLogin = (e) => { if (e.key === 'Enter') doLogin(); };
+    usernameInput.addEventListener('keypress', handleEnterLogin);
+    passwordInput.addEventListener('keypress', handleEnterLogin);
+
+    // ---- 注册模态框控制 ----
+    const modal = document.getElementById('registerModal');
+    const registerLink = document.getElementById('registerLink');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const cancelRegisterBtn = document.getElementById('cancelRegisterBtn');
+    const confirmRegisterBtn = document.getElementById('confirmRegisterBtn');
+
+    function openModal() {
+        modal.style.display = 'flex';
+        // 清空输入框
+        document.getElementById('regUsername').value = '';
+        document.getElementById('regPassword').value = '';
+        document.getElementById('regConfirmPassword').value = '';
+    }
+    function closeModal() {
+        modal.style.display = 'none';
+    }
+    registerLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        openModal();
+    });
+    closeModalBtn.addEventListener('click', closeModal);
+    cancelRegisterBtn.addEventListener('click', closeModal);
+    // 点击模态框背景关闭
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    // ---- 注册请求 ----
+    async function doRegister() {
+        const username = document.getElementById('regUsername').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const confirm = document.getElementById('regConfirmPassword').value;
+        if (!username || !password) {
+            alert('请填写用户名和密码');
+            return;
+        }
+        if (password !== confirm) {
+            alert('两次输入的密码不一致');
+            return;
+        }
+        try {
+            const response = await fetch('http://localhost:8080/api/user/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ username, password })
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert('注册成功！请登录');
+                // 自动填充登录框
+                usernameInput.value = username;
+                passwordInput.value = password;
+                closeModal();
+            } else {
+                alert(data.message || '注册失败，用户名可能已存在');
+            }
+        } catch (err) {
+            console.error('注册请求失败:', err);
+            alert('无法连接服务器，请确保后端已启动');
+        }
+    }
+    confirmRegisterBtn.addEventListener('click', doRegister);
+    // 注册模态框内回车注册
+    const regInputs = ['regUsername', 'regPassword', 'regConfirmPassword'];
+    regInputs.forEach(id => {
+        document.getElementById(id).addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') doRegister();
+        });
+    });
+</script>
+</body>
+</html>

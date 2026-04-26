@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<title>个人数据</title>
+	<style>
+		* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微软雅黑", sans-serif;
+        }
+        body {
+            background-color: #e0fbfa;
+            overflow-x: hidden;
+        }
+        .top-header {
+            width: 100%;
+            height: 70px;
+            background: #40e9e0;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 99;
+            gap: 20px;
+        }
+        .logo-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            white-space: nowrap;
+        }
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            height: 40px;
+            border-radius: 20px;
+            border: none;
+            padding: 0 20px;
+            font-size: 16px;
+            background: #fff;
+        }
+        .container {
+            display: flex;
+            margin-top: 70px;
+        }
+        .sidebar {
+            width: 180px;
+            background-color: #a0f7f2;
+            min-height: calc(100vh - 70px);
+            padding-top: 30px;
+            position: fixed;
+            left: 0;
+            top: 70px;
+        }
+        .sidebar-item {
+            font-size: 26px;
+            padding: 18px 20px;
+            color: #ffffff;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+        .sidebar-item.active {
+            color: #ffbc2e;
+            font-weight: bold;
+        }
+        .consultant-menu { display: none; }
+        .main-wrap {
+            margin-left: 180px;
+            padding: 30px 40px;
+            width: calc(100% - 180px);
+        }
+        .card {
+            background: #fff;
+            border-radius: 20px;
+            border: 1px solid #40e9e0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 18px 24px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2d5bff;
+            border-bottom: 2px solid #e0fbfa;
+            background: #fafffe;
+        }
+        .card-body { padding: 20px 24px; }
+        .user-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #fff;
+            overflow: hidden;
+            border: 3px solid #40e9e0;
+            cursor: pointer;
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .user-info { flex: 1; }
+        .username {
+            font-size: 22px;
+            font-weight: bold;
+            color: #222;
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+        .edit-icon {
+            font-size: 14px;
+            color: #888;
+            margin-left: 8px;
+        }
+        .today-mood {
+            background: #e0fbfa;
+            border-radius: 30px;
+            padding: 10px 18px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .mood-text { font-weight: bold; color: #2d5bff; }
+        .mood-emoji { font-size: 28px; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        .stat-item {
+            background: #f8fffe;
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid #e0fbfa;
+        }
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2d5bff;
+        }
+        .stat-label {
+            font-size: 13px;
+            color: #777;
+            margin-top: 6px;
+        }
+        .chart-card { margin-bottom: 30px; }
+        .chart-container { min-height: 260px; }
+        canvas { max-height: 240px; width: 100%; }
+        .bottom-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .record-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .encourage-text {
+            text-align: center;
+            font-size: 18px;
+            color: #2d5bff;
+            margin-top: 16px;
+            font-weight: bold;
+        }
+        .consultant-panel {
+            display: none;
+            background: #fff;
+            border-radius: 20px;
+            border: 1px solid #40e9e0;
+            overflow: hidden;
+        }
+        .panel-header {
+            background: #f0fffd;
+            padding: 14px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            color: #2d5bff;
+            border-bottom: 1px solid #e0fbfa;
+        }
+        .panel-body { padding: 16px; }
+        .msg-box {
+            height: 260px;
+            overflow-y: auto;
+            background: #fafefe;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .msg-item { margin: 12px 0; display: flex; flex-direction: column; }
+        .patient-msg {
+            background: #e9f7f5;
+            padding: 8px 14px;
+            border-radius: 18px;
+            align-self: flex-start;
+            max-width: 80%;
+            font-size: 14px;
+        }
+        .consult-msg {
+            background: #40e9e0;
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 18px;
+            align-self: flex-end;
+            max-width: 80%;
+            font-size: 14px;
+        }
+        .msg-time {
+            font-size: 11px;
+            color: #aaa;
+            margin-top: 4px;
+        }
+        .send-box {
+            display: flex;
+            gap: 10px;
+        }
+        .reply-input {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 30px;
+            border: 1px solid #cceeff;
+            outline: none;
+        }
+        .send-btn {
+            background: #40e9e0;
+            border: none;
+            padding: 0 18px;
+            border-radius: 30px;
+            color: #fff;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            width: 450px;
+            background: #fff;
+            border-radius: 24px;
+            padding: 32px;
+            border: 2px solid #40e9e0;
+        }
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2d5bff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .form-item { margin-bottom: 18px; }
+        .form-item label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 15px;
+        }
+        .form-item input, .form-item select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid #cceeff;
+        }
+        .save-btn {
+            background: #40e9e0;
+            color: #fff;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 40px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .highlight { background-color: #ffeb3b; transition: background 0.3s; }
+	</style>
+</head>
+<body>
+<div class="top-header">
+	<div class="logo-title">《治愈维拉》</div>
+	<input type="text" class="search-bar" id="searchInput" placeholder="搜索页面内容...">
+</div>
+<div class="container">
+	<div class="sidebar">
+		<div class="sidebar-item">首页</div>
+		<div class="sidebar-item">心理咨询</div>
+		<div class="sidebar-item">心情记录</div>
+		<div class="sidebar-item">治愈vera</div>
+		<div class="sidebar-item">答案之书</div>
+		<div class="sidebar-item">心理测试</div>
+		<div class="sidebar-item">治愈工具</div>
+		<div class="sidebar-item active">个人数据</div>
+		<div class="sidebar-item consultant-menu">咨询师后台</div>
+	</div>
+
+	<div class="main-wrap">
+		<div class="user-row">
+			<div class="card" style="grid-column: span 1;">
+				<div class="card-body">
+					<div class="user-card">
+						<div class="avatar" id="avatarClick">
+							<img id="avatarImg" src="src/images/00.jpg" alt="头像">
+						</div>
+						<div class="user-info">
+							<div class="username" id="usernameClick">
+								<span id="nameText">加载中...</span>
+								<span class="edit-icon">✎</span>
+							</div>
+							<div class="today-mood">
+								<span>今日心情</span>
+								<span class="mood-text" id="moodText">--</span>
+								<span class="mood-emoji" id="moodEmoji">😐</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="card" style="grid-column: span 1;">
+				<div class="card-header">📊 数据概览</div>
+				<div class="card-body">
+					<div class="stats-grid" id="statsGrid">
+						<div class="stat-item"><div class="stat-number">--</div><div class="stat-label">累计记录天数</div></div>
+						<div class="stat-item"><div class="stat-number">--</div><div class="stat-label">平均心情值</div></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="card chart-card">
+			<div class="card-header">📈 近7天心情指数</div>
+			<div class="card-body chart-container">
+				<canvas id="moodChart"></canvas>
+			</div>
+		</div>
+
+		<div class="bottom-row">
+			<div class="card">
+				<div class="card-header">📋 心理咨询记录</div>
+				<div class="card-body">
+					<div class="record-item"><strong>最近咨询：</strong> 暂无</div>
+					<div class="record-item"><strong>咨询师：</strong> 暂无</div>
+					<div class="record-item"><strong>咨询内容：</strong> 暂无</div>
+					<div class="encourage-text">✨ 你已经很棒了 ✨</div>
+				</div>
+			</div>
+			<div class="consultant-panel" id="msgPanel">
+				<div class="panel-header" onclick="togglePanel()">
+					<span>💬 患者对话 (咨询师模式)</span>
+					<i class="fas fa-chevron-down" id="panelIcon"></i>
+				</div>
+				<div class="panel-body" id="panelBody">
+					<div class="msg-box" id="msgBox">
+						<div class="msg-item"><div class="patient-msg">最近总是睡不好，心情很低落</div><div class="msg-time">患者 19:32</div></div>
+						<div class="msg-item"><div class="patient-msg">使用心情记录后轻松了一点</div><div class="msg-time">患者 10:15</div></div>
+					</div>
+					<div class="send-box">
+						<input class="reply-input" id="replyText" placeholder="输入回复内容...">
+						<button class="send-btn" onclick="sendReply()">发送</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal" id="editModal">
+	<div class="modal-content">
+		<div class="modal-title">编辑个人信息</div>
+		<div class="form-item">
+			<label>昵称</label>
+			<input type="text" id="editName">
+		</div>
+		<div class="form-item">
+			<label>身份</label>
+			<select id="editRole">
+				<option value="user">普通用户</option>
+				<option value="consultant">咨询师</option>
+			</select>
+		</div>
+		<button class="save-btn" onclick="saveUserInfo()">保存并切换</button>
+	</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://kit.fontawesome.com/a8e6c8b9f6.js" crossorigin="anonymous"></script>
+<script>
+	const API_BASE = 'http://localhost:8080';  // 后端基础URL，可根据需要修改
+
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+        alert('请先登录');
+        window.location.href = 'dl.html';
+    }
+
+    let currentUser = { username: '', avatarUrl: '', role: 'user' };
+    let chartInstance = null;
+
+    // 通用fetch封装
+    async function fetchJson(url) {
+        const res = await fetch(API_BASE + url);
+        return res.json();
+    }
+
+    async function loadUserInfo() {
+        try {
+            const data = await fetchJson(`/api/user/info?userId=${userId}`);
+            if (data.success) {
+                currentUser.username = data.username;
+                currentUser.avatarUrl = data.avatarUrl || 'src/images/00.jpg';
+                currentUser.role = data.role || 'user';
+                document.getElementById('nameText').innerText = currentUser.username;
+                document.getElementById('avatarImg').src = currentUser.avatarUrl;
+                document.getElementById('editName').value = currentUser.username;
+                document.getElementById('editRole').value = currentUser.role;
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    async function loadTodayMood() {
+        try {
+            const data = await fetchJson(`/api/mood/today?userId=${userId}`);
+            if (data.success) {
+                document.getElementById('moodText').innerText = data.text;
+                document.getElementById('moodEmoji').innerText = data.emoji;
+            } else {
+                document.getElementById('moodText').innerText = '未记录';
+                document.getElementById('moodEmoji').innerText = '📝';
+            }
+        } catch(e) {
+            document.getElementById('moodText').innerText = '未记录';
+            document.getElementById('moodEmoji').innerText = '📝';
+        }
+    }
+
+    async function loadStats() {
+        try {
+            const data = await fetchJson(`/api/mood/stats?userId=${userId}`);
+            if (data.success) {
+                document.getElementById('statsGrid').innerHTML = `
+                    <div class="stat-item"><div class="stat-number">${data.totalDays}</div><div class="stat-label">累计记录天数</div></div>
+                    <div class="stat-item"><div class="stat-number">${data.avgScore}</div><div class="stat-label">平均心情值</div></div>
+                `;
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    async function loadChart() {
+        try {
+            const data = await fetchJson(`/api/mood/weekly?userId=${userId}`);
+            if (data.success) {
+                const ctx = document.getElementById('moodChart').getContext('2d');
+                if (chartInstance) chartInstance.destroy();
+                chartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.dates,
+                        datasets: [{
+                            label: '心情指数',
+                            data: data.scores,
+                            borderColor: '#40e9e0',
+                            backgroundColor: 'rgba(64,233,224,0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.3,
+                            pointBackgroundColor: '#2d5bff',
+                            pointRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        scales: { y: { min: 1, max: 10, grid: { color: '#eee' } } }
+                    }
+                });
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    async function updateUser(updateData) {
+        const params = new URLSearchParams({ userId, ...updateData });
+        try {
+            const res = await fetch(`${API_BASE}/api/user/update?${params.toString()}`, { method: 'PUT' });
+            const data = await res.json();
+            if (data.success) {
+                if (data.username) {
+                    currentUser.username = data.username;
+                    document.getElementById('nameText').innerText = data.username;
+                    localStorage.setItem('username', data.username);
+                }
+                if (data.avatarUrl) {
+                    currentUser.avatarUrl = data.avatarUrl;
+                    document.getElementById('avatarImg').src = data.avatarUrl;
+                }
+                alert('更新成功');
+                return true;
+            } else {
+                alert(data.message || '更新失败');
+                return false;
+            }
+        } catch(err) {
+            alert('请求失败');
+            return false;
+        }
+    }
+
+    async function updateRole(role) {
+        try {
+            const res = await fetch(`${API_BASE}/api/user/updateRole?userId=${userId}&role=${role}`, { method: 'PUT' });
+            const data = await res.json();
+            if (data.success) {
+                currentUser.role = role;
+                alert('身份更新成功');
+                switchRoleUI();
+                return true;
+            } else {
+                alert(data.message || '身份更新失败');
+                return false;
+            }
+        } catch(err) {
+            alert('请求失败');
+            return false;
+        }
+    }
+
+    function switchRoleUI() {
+        const panel = document.getElementById('msgPanel');
+        if (currentUser.role === 'consultant') {
+            document.querySelectorAll('.consultant-menu').forEach(el => el.style.display = 'block');
+            panel.style.display = 'block';
+        } else {
+            document.querySelectorAll('.consultant-menu').forEach(el => el.style.display = 'none');
+            panel.style.display = 'none';
+        }
+    }
+
+    document.getElementById('avatarClick').addEventListener('click', () => {
+        const newUrl = prompt('请输入新的头像图片URL（网络地址）:', currentUser.avatarUrl);
+        if (newUrl && newUrl.trim()) updateUser({ avatarUrl: newUrl.trim() });
+    });
+
+    document.getElementById('usernameClick').addEventListener('click', () => {
+        const newName = prompt('请输入新的昵称:', currentUser.username);
+        if (newName && newName.trim()) updateUser({ username: newName.trim() });
+    });
+
+    function openEditModal() {
+        document.getElementById('editName').value = currentUser.username;
+        document.getElementById('editRole').value = currentUser.role;
+        document.getElementById('editModal').style.display = 'flex';
+    }
+    function closeModal() { document.getElementById('editModal').style.display = 'none'; }
+    async function saveUserInfo() {
+        const newName = document.getElementById('editName').value.trim();
+        const newRole = document.getElementById('editRole').value;
+        if (!newName) { alert('昵称不能为空'); return; }
+        if (newName !== currentUser.username) {
+            const ok = await updateUser({ username: newName });
+            if (!ok) return;
+        }
+        if (newRole !== currentUser.role) {
+            await updateRole(newRole);
+        }
+        closeModal();
+    }
+
+    function sendReply() {
+        const text = document.getElementById('replyText').value.trim();
+        if (!text) return;
+        const time = new Date().toLocaleTimeString().slice(0,5);
+        const msgBox = document.getElementById('msgBox');
+        msgBox.innerHTML += `<div class="msg-item"><div class="consult-msg">${text}</div><div class="msg-time">咨询师 ${time}</div></div>`;
+        document.getElementById('replyText').value = '';
+        msgBox.scrollTop = msgBox.scrollHeight;
+    }
+    function togglePanel() {
+        const body = document.getElementById('panelBody');
+        const icon = document.getElementById('panelIcon');
+        if (body.style.display === 'none') {
+            body.style.display = 'block';
+            icon.className = 'fas fa-chevron-down';
+        } else {
+            body.style.display = 'none';
+            icon.className = 'fas fa-chevron-up';
+        }
+    }
+
+    const pageMap = {
+        "首页": "zy.html", "心理咨询": "xlzx.html", "心情记录": "xqjl.html", "治愈vera": "vera.html",
+        "答案之书": "dazs.html", "心理测试": "xlcs.html", "治愈工具": "zygj.html", "个人数据": "grsj.html"
+    };
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        const text = item.innerText.trim();
+        if (pageMap[text] && text !== "个人数据") {
+            item.addEventListener('click', () => location.href = pageMap[text]);
+        }
+    });
+
+    function searchPage() {
+        const kw = document.getElementById('searchInput').value.trim();
+        if (!kw) return;
+        alert('搜索功能暂未完善');
+    }
+    document.getElementById('searchInput').addEventListener('keypress', e => { if (e.key === 'Enter') searchPage(); });
+
+    window.onload = async () => {
+        await loadUserInfo();
+        await loadTodayMood();
+        await loadStats();
+        await loadChart();
+        switchRoleUI();
+        document.querySelectorAll('.edit-icon').forEach(icon => {
+            icon.addEventListener('click', (e) => { e.stopPropagation(); openEditModal(); });
+        });
+        const panelBody = document.getElementById('panelBody');
+        if (panelBody) panelBody.style.display = 'block';
+    };
+</script>
+</body>
+</html>
