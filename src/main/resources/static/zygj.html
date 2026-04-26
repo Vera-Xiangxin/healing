@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8">
+		<title>治愈工具</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+				font-family: "微软雅黑", sans-serif;
+			}
+
+			body {
+				background: #e6fffd;
+			}
+
+			.top-header {
+				width: 100%;
+				height: 70px;
+				background: #40e9e0;
+				display: flex;
+				align-items: center;
+				padding: 0 30px;
+				position: fixed;
+				top: 0;
+				left: 0;
+				z-index: 99;
+				gap: 20px;
+			}
+
+			.logo-title {
+				font-size: 24px;
+				font-weight: bold;
+				color: #fff;
+				white-space: nowrap;
+			}
+
+			.search-bar {
+				flex: 1;
+				max-width: 600px;
+				height: 40px;
+				border-radius: 20px;
+				border: none;
+				padding: 0 20px;
+				font-size: 16px;
+			}
+
+			.container {
+				display: flex;
+				margin-top: 70px;
+			}
+
+			.sidebar {
+				width: 180px;
+				background-color: #a0f7f2;
+				min-height: calc(100vh - 70px);
+				padding-top: 30px;
+				position: fixed;
+				left: 0;
+				top: 70px;
+			}
+			
+			.sidebar-item {
+				font-size: 26px;
+				padding: 18px 20px;
+				color: #ffffff;
+				cursor: pointer;
+				transition: 0.2s;
+				text-align: center;
+			}
+			
+			.sidebar-item.active {
+				color: #ffbc2e;
+				font-weight: bold;
+			}
+
+			.main-content {
+				margin-left: 180px;
+				padding: 60px;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 50px;
+				justify-content: center;
+				align-items: center;
+				min-height: calc(100vh - 70px);
+			}
+
+			.tool-card {
+				width: 220px;
+				height: 220px;
+				border-radius: 24px;
+				border: 3px solid #40e9e0;
+				background: #fff;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				font-size: 22px;
+				color: #2d9dff;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+			}
+
+			.tool-card:hover {
+				transform: translateY(-6px);
+				box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+			}
+
+			.tool-icon {
+				font-size: 60px;
+				margin-bottom: 14px;
+			}
+
+			.modal {
+				display: none;
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: rgba(0, 0, 0, 0.5);
+				z-index: 999;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.modal-content {
+				width: 700px;
+				background: #fff;
+				border-radius: 24px;
+				padding: 50px;
+				text-align: center;
+				border: 3px solid #40e9e0;
+				position: relative;
+			}
+
+			.modal-title {
+				font-size: 32px;
+				font-weight: bold;
+				color: #2d9dff;
+				margin-bottom: 24px;
+			}
+
+			.close-btn {
+				margin-top: 30px;
+				padding: 12px 32px;
+				background: #40e9e0;
+				color: #fff;
+				border: none;
+				border-radius: 16px;
+				font-size: 18px;
+				cursor: pointer;
+			}
+
+			textarea {
+				width: 100%;
+				height: 160px;
+				border-radius: 16px;
+				padding: 20px;
+				font-size: 18px;
+				border: 2px solid #cceeff;
+				resize: none;
+			}
+
+			.tip-text {
+				font-size: 20px;
+				line-height: 1.8;
+				color: #333;
+				text-align: left;
+			}
+
+			.time {
+				font-size: 52px;
+				font-weight: bold;
+				margin: 30px 0;
+				color: #333;
+			}
+
+			.color-box {
+				display: inline-block;
+				width: 60px;
+				height: 60px;
+				border-radius: 12px;
+				margin: 10px;
+				cursor: pointer;
+				border: 3px solid #fff;
+				transition: 0.2s;
+			}
+
+			.color-box:hover {
+				transform: scale(1.1);
+			}
+
+			#colorResult {
+				margin-top: 20px;
+				font-size: 22px;
+				font-weight: bold;
+				color: #444;
+				min-height: 30px;
+			}
+
+			.highlight {
+				background-color: #ffeb3b;
+				transition: background 0.3s;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="top-header">
+			<div class="logo-title">《治愈维拉》</div>
+			<input type="text" class="search-bar" id="searchInput" placeholder="搜索心理工具...">
+		</div>
+		<div class="container">
+			<div class="sidebar">
+				<div class="sidebar-item">首页</div>
+				<div class="sidebar-item">心理咨询</div>
+				<div class="sidebar-item">心情记录</div>
+				<div class="sidebar-item">治愈vera</div>
+				<div class="sidebar-item">答案之书</div>
+				<div class="sidebar-item">心理测试</div>
+				<div class="sidebar-item active">治愈工具</div>
+				<div class="sidebar-item">个人数据</div>
+			</div>
+			<div class="main-content">
+				<div class="tool-card" onclick="openModal('diary')">
+					<div class="tool-icon">📓</div>
+					<div>心情日记</div>
+				</div>
+				<div class="tool-card" onclick="openModal('tree')">
+					<div class="tool-icon">🌳</div>
+					<div>情绪树洞</div>
+				</div>
+				<div class="tool-card" onclick="openModal('bottle')">
+					<div class="tool-icon">🧴</div>
+					<div>情绪解压瓶</div>
+				</div>
+				<div class="tool-card" onclick="openModal('positive')">
+					<div class="tool-icon">☀️</div>
+					<div>积极暗示</div>
+				</div>
+				<div class="tool-card" onclick="openModal('calm')">
+					<div class="tool-icon">🕊️</div>
+					<div>静心倒计时</div>
+				</div>
+				<div class="tool-card" onclick="openModal('color')">
+					<div class="tool-icon">🎨</div>
+					<div>情绪色彩</div>
+				</div>
+				<div class="tool-card" onclick="openModal('card')">
+					<div class="tool-icon">💌</div>
+					<div>治愈卡片</div>
+				</div>
+				<div class="tool-card" onclick="openModal('tip')">
+					<div class="tool-icon">📚</div>
+					<div>心理小知识</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal" id="modal">
+			<div class="modal-content">
+				<div id="modalBody"></div>
+			</div>
+		</div>
+
+		<script>
+			function openModal(type) {
+				let html = '';
+				if (type === 'diary') {
+					html =
+						`<div class="modal-title">📓 心情日记</div><p class="tip-text">在这里记录你今天的情绪、感受、遇到的小事，不用隐藏，不用伪装，安心写下最真实的自己。每一次记录，都是和自己温柔的对话。</p><textarea placeholder="开始记录今天的心情吧..."></textarea><button class="close-btn" onclick="closeModal()">保存并关闭</button>`;
+				}
+				if (type === 'tree') {
+					html =
+						`<div class="modal-title">🌳 情绪树洞</div><p class="tip-text">这里是完全安全的情绪树洞，你可以把所有委屈、难过、压力、不安全部丢进来。没有人评判你，没有人打扰你，树洞会安静倾听，帮你收藏所有不为人知的情绪。</p><textarea placeholder="把心里的话都说出来吧..."></textarea><button class="close-btn" onclick="closeModal()">释放情绪</button>`;
+				}
+				if (type === 'bottle') {
+					html =
+						`<div class="modal-title">🧴 情绪解压瓶</div><p class="tip-text">把所有不开心、焦虑、烦躁、疲惫都装进这个解压瓶里，然后轻轻关上。让坏情绪暂时封存，给自己一点空间呼吸、放松、休息。你不需要一直坚强，偶尔脆弱也没关系，释放完情绪，再重新出发就好。</p><button class="close-btn" onclick="closeModal()">已释放坏情绪</button>`;
+				}
+				if (type === 'positive') {
+					html =
+						`<div class="modal-title">☀️ 积极暗示</div><p class="tip-text" id="positiveTxt">我值得被爱，我很棒，我可以慢慢来，我允许自己放松</p><button class="close-btn" onclick="closeModal()">收下温暖力量</button>`;
+					setTimeout(() => {
+						let list = ["我值得被爱，我很棒，我可以慢慢来，我允许自己放松", "今天的我已经足够努力，不必苛责自己，不必追求完美", "坏情绪都会慢慢过去，我会越来越温柔、越来越强大",
+							"我接纳自己所有样子，开心的、难过的，都是真实的我", "生活不用急，我有足够时间成为更好的自己", "我被世界温柔爱着，也被自己认真守护着",
+							"每一步前行都有意义，每一次坚持都闪闪发光"
+						];
+						let i = 0;
+						setInterval(() => {
+							document.getElementById("positiveTxt").innerText = list[++i % list.length];
+						}, 3500);
+					}, 500);
+				}
+				if (type === 'calm') {
+					html =
+						`<div class="modal-title">🕊️ 静心倒计时</div><p class="tip-text">找一个舒服的姿势坐下或躺下，闭上眼睛，专注呼吸。不想过去，不想未来，只感受此刻的安静与放松，给自己5分钟完全属于自己的时间。</p><div class="time" id="calmTime">05:00</div><button class="close-btn" onclick="startCalm()">开始静心</button><button class="close-btn" onclick="closeModal()">退出静心</button>`;
+				}
+				if (type === 'color') {
+					html =
+						`<div class="modal-title">🎨 情绪色彩</div><p class="tip-text">选择一个最能代表你现在心情的颜色，系统会为你解读当下的情绪状态。</p><div><div class="color-box" style="background:#ff9999" onclick="setColor('红色代表你现在充满能量，可能有些激动、热情，也可能带有一点小烦躁，需要适当放松')"></div><div class="color-box" style="background:#99ccff" onclick="setColor('蓝色代表你现在安静、平和、内心清澈，适合静心思考与休息')"></div><div class="color-box" style="background:#99ff99" onclick="setColor('绿色代表你现在轻松、治愈、充满希望，情绪正在慢慢变好')"></div><div class="color-box" style="background:#ffff99" onclick="setColor('黄色代表你现在快乐、阳光、温暖，心里藏着小小的开心')"></div><div class="color-box" style="background:#cc99ff" onclick="setColor('紫色代表你现在温柔、感性、有一点小情绪，需要被安慰')"></div></div><div id="colorResult"></div><button class="close-btn" onclick="closeModal()">完成</button>`;
+				}
+				if (type === 'card') {
+					let cards = ["你已经很棒了，不用逼自己太紧，累了就停下来休息一会儿🌿", "所有情绪都是正常的，允许自己难过，允许自己放空，允许一切发生", "慢慢来，不用和别人比较，你有自己的节奏，一切都会好起来",
+						"你值得被温柔对待，值得被爱，值得拥有所有美好，首先要爱自己", "放松一点，生活不必那么紧绷，你已经做得很好了", "不管今天多辛苦，你都安全度过了，给自己一个小小的拥抱",
+						"坏情绪只是暂时的，明天醒来，一切都会变得更温柔"
+					];
+					let card = cards[Math.floor(Math.random() * cards.length)];
+					html =
+						`<div class="modal-title">💌 治愈卡片</div><p class="tip-text" style="font-size:24px; text-align:center">${card}</p><button class="close-btn" onclick="closeModal()">收下这份温暖</button>`;
+				}
+				if (type === 'tip') {
+					let tips = ["感到焦虑时，试着深呼吸4秒，屏息4秒，呼气6秒，重复几次，情绪会慢慢平稳", "每天给自己10分钟放空时间，什么都不做，什么都不想，这是爱自己最简单的方式",
+						"情绪不是敌人，它是来提醒你：你需要休息、需要被关心、需要好好爱自己", "累了就休息，不是放弃，不是偷懒，是给身体和心灵充电的时间", "允许一切发生，允许自己不完美，允许情绪流动，你已经很努力了",
+						"不要把所有事情都扛在身上，你可以脆弱，可以求助，可以慢慢来", "真正的强大，不是从不难过，而是难过之后，依然愿意温柔对待生活"
+					];
+					let tip = tips[Math.floor(Math.random() * tips.length)];
+					html =
+						`<div class="modal-title">📚 心理小知识</div><p class="tip-text">${tip}</p><button class="close-btn" onclick="closeModal()">记住啦</button>`;
+				}
+				document.getElementById("modalBody").innerHTML = html;
+				document.getElementById("modal").style.display = "flex";
+			}
+
+			function setColor(msg) {
+				document.getElementById("colorResult").innerText = msg;
+			}
+
+			function closeModal() {
+				document.getElementById("modal").style.display = "none";
+			}
+
+			function startCalm() {
+				let sec = 300,
+					timer = setInterval(() => {
+						let m = Math.floor(sec / 60),
+							s = sec % 60;
+						document.getElementById("calmTime").innerText = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s :
+						s);
+						if (sec-- <= 0) clearInterval(timer);
+					}, 1000);
+			}
+
+			const pageMap = {
+				"首页": "zy.html",
+				"心理咨询": "xlzx.html",
+				"心情记录": "xqjl.html",
+				"治愈vera": "vera.html",
+				"答案之书": "dazs.html",
+				"心理测试": "xlcs.html",
+				"治愈工具": "zygj.html",
+				"个人数据": "grsj.html"
+			};
+			document.querySelectorAll('.sidebar-item').forEach(item => {
+				const text = item.innerText.trim();
+				if (pageMap[text] && text !== "治愈工具") {
+					item.addEventListener('click', () => {
+						location.href = pageMap[text];
+					});
+				}
+			});
+
+			function searchPage() {
+				const keyword = document.getElementById('searchInput').value.trim();
+				if (!keyword) return;
+				document.querySelectorAll('.highlight').forEach(el => el.classList.remove('highlight'));
+				const mainArea = document.querySelector('.main-content');
+				if (!mainArea) return;
+				const walker = document.createTreeWalker(mainArea, NodeFilter.SHOW_TEXT, {
+					acceptNode: (node) => {
+						if (node.parentElement.tagName === 'SCRIPT' || node.parentElement.tagName === 'STYLE')
+						return NodeFilter.FILTER_REJECT;
+						return NodeFilter.FILTER_ACCEPT;
+					}
+				});
+				let firstMatch = null;
+				while (walker.nextNode()) {
+					const node = walker.currentNode;
+					if (node.textContent.toLowerCase().includes(keyword.toLowerCase())) {
+						firstMatch = node.parentElement;
+						break;
+					}
+				}
+				if (firstMatch) {
+					firstMatch.classList.add('highlight');
+					firstMatch.scrollIntoView({
+						behavior: 'smooth',
+						block: 'center'
+					});
+				} else {
+					alert('未找到相关内容');
+				}
+			}
+			document.getElementById('searchInput').addEventListener('keypress', (e) => {
+				if (e.key === 'Enter') searchPage();
+			});
+		</script>
+	</body>
+</html>

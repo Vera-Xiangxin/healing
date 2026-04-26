@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<title>心情记录 </title>
+	<style>
+		* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微软雅黑", sans-serif;
+        }
+        body {
+            background-color: #e6fffd;
+        }
+        /* 顶部和侧边栏样式沿用你原有的，这里精简保留关键样式 */
+        .top-header {
+            background-color: #40e9e0;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 99;
+            gap: 20px;
+        }
+        .logo-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            height: 40px;
+            border-radius: 20px;
+            border: none;
+            padding: 0 20px;
+            background: #fff;
+        }
+        .container {
+            display: flex;
+            margin-top: 70px;
+        }
+        .sidebar {
+            width: 180px;
+            background-color: #a0f7f2;
+            min-height: calc(100vh - 70px);
+            padding-top: 30px;
+            position: fixed;
+        }
+        .sidebar-item {
+            font-size: 26px;
+            padding: 18px 20px;
+            color: #ffffff;
+            cursor: pointer;
+            text-align: center;
+        }
+        .sidebar-item.active {
+            color: #ffbc2e;
+            font-weight: bold;
+        }
+        .main-wrap {
+            margin-left: 180px;
+            padding: 40px 50px;
+            display: grid;
+            grid-template-columns: 330px 380px 400px;
+            gap: 30px;
+            width: 100%;
+        }
+        .title {
+            font-size: 30px;
+            margin-bottom: 20px;
+            color: #40a9ff;
+            font-weight: 600;
+        }
+        .mood-list {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        .mood-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #fff;
+            border-radius: 12px;
+            padding: 8px 4px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 2px 8px #eee;
+        }
+        .mood-item:hover {
+            transform: scale(1.1);
+            background: #d6f9f6;
+        }
+        .mood-emoji {
+            font-size: 38px;
+            width: 50px;
+            height: 50px;
+        }
+        .mood-text {
+            font-size: 15px;
+            margin-top: 4px;
+            color: #555;
+        }
+        .calendar-box {
+            background: #fff;
+            border-radius: 16px;
+            padding: 18px;
+            border: 2px solid #40e9e0;
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-weight: bold;
+            color: #40a9ff;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            text-align: center;
+        }
+        .calendar-day-title {
+            color: #40c8ff;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .calendar-date {
+            padding: 8px 4px;
+            border-radius: 8px;
+            cursor: pointer;
+            position: relative;
+        }
+        .calendar-date.today {
+            background: #40a9ff;
+            color: white;
+        }
+        .calendar-date.active {
+            background: #40e9e0;
+            color: #fff;
+        }
+        .mood-mark {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            font-size: 12px;
+        }
+        .show-card {
+            background: linear-gradient(135deg, #d6f9f6, #fff);
+            border: 3px solid #40e9e0;
+            border-radius: 20px;
+            padding: 50px 20px;
+            text-align: center;
+            margin-top: 60px;
+        }
+        .show-emoji {
+            font-size: 140px;
+        }
+        .show-text {
+            font-size: 32px;
+            color: #40a9ff;
+            font-weight: bold;
+        }
+        .diary-notebook {
+            background: #fff;
+            border: 3px solid #40e9e0;
+            border-radius: 16px;
+            padding: 25px;
+            min-height: 620px;
+            position: relative;
+            background-image: linear-gradient(0deg, #f6f6f6 1px, transparent 1px);
+            background-size: 100% 32px;
+        }
+        .diary-textarea {
+            width: 100%;
+            min-height: 480px;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 17px;
+            line-height: 32px;
+            resize: none;
+            padding-left: 10px;
+        }
+        .diary-btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .diary-btn {
+            flex: 1;
+            height: 48px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .save-btn {
+            background: #40e9e0;
+            color: #fff;
+        }
+        .del-btn {
+            background: #89cff0;
+            color: #fff;
+        }
+        .mask {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+        .mood-popup {
+            background: #fff;
+            padding: 45px;
+            border-radius: 20px;
+            text-align: center;
+            border: 3px solid #40e9e0;
+        }
+        .close-btn {
+            padding: 12px 35px;
+            background: #40e9e0;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+	</style>
+</head>
+<body>
+<div class="top-header">
+	<div class="logo-title">《治愈维拉》</div>
+	<input type="text" class="search-bar" id="searchInput" placeholder="搜索页面内容...">
+</div>
+<div class="container">
+	<div class="sidebar">
+		<div class="sidebar-item">首页</div>
+		<div class="sidebar-item">心理咨询</div>
+		<div class="sidebar-item active">心情记录</div>
+		<div class="sidebar-item">治愈vera</div>
+		<div class="sidebar-item">答案之书</div>
+		<div class="sidebar-item">心理测试</div>
+		<div class="sidebar-item">治愈工具</div>
+		<div class="sidebar-item">个人数据</div>
+	</div>
+	<div class="main-wrap">
+		<div class="left-col">
+			<h2 class="title">今日心情</h2>
+			<div class="mood-list" id="moodList"></div>
+			<div class="calendar-box">
+				<div class="calendar-header" id="calendarHeader"></div>
+				<div class="calendar-grid" id="calendarGrid"></div>
+			</div>
+		</div>
+		<div class="mid-col">
+			<div class="show-card">
+				<div class="show-emoji" id="showEmoji">😊</div>
+				<div class="show-text" id="showText">祝你天天开心</div>
+			</div>
+		</div>
+		<div class="right-col diary-box">
+			<h2 class="title">日记</h2>
+			<div class="diary-notebook">
+				<textarea class="diary-textarea" id="diaryInput" placeholder="写下今天的心情～"></textarea>
+			</div>
+			<div class="diary-btn-group">
+				<button class="diary-btn save-btn" id="saveDiaryBtn">💾 保存日记</button>
+				<button class="diary-btn del-btn" id="delDiaryBtn">🗑 删除日记</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="mask" id="moodMask">
+	<div class="mood-popup">
+		<div class="popup-emoji" id="popEmoji"></div>
+		<div class="popup-say" id="popSay"></div>
+		<button class="close-btn" onclick="closePopup()">关闭</button>
+	</div>
+</div>
+
+<script>
+	// ---------- 固定使用的用户ID（请修改为你的实际用户ID）----------
+    const USER_ID = 1;   // 改为你在 users 表中的真实 id，比如 1
+
+    // 心情数据
+    const moodData = [
+        { emoji: "🥰", name: "开心", text: "今天也要甜甜的呀～", showText: "保持开心 永远可爱" },
+        { emoji: "😠", name: "生气", text: "不气不气～抱抱你", showText: "别生气啦 会变丑" },
+        { emoji: "🥺", name: "难过", text: "难过就哭一会吧，我陪着你", showText: "难过只是暂时的" },
+        { emoji: "😴", name: "疲惫", text: "辛苦啦～快去休息一下吧", showText: "累了就歇歇吧" },
+        { emoji: "🤔", name: "迷茫", text: "慢慢来，一切都会好起来", showText: "一切都会有答案" },
+        { emoji: "😐", name: "平静", text: "安安静静也很美好呀", showText: "心安即是归处" },
+        { emoji: "😍", name: "心动", text: "今天也遇见美好啦", showText: "永远为温柔心动" },
+        { emoji: "😜", name: "开心", text: "快乐加倍！元气满满", showText: "快乐永远不打烊" },
+        { emoji: "😱", name: "惊讶", text: "哇！今天有小惊喜", showText: "生活处处有惊喜" },
+        { emoji: "🤯", name: "烦躁", text: "深呼吸～放轻松一点", showText: "静下心来就好啦" },
+        { emoji: "😇", name: "幸福", text: "被爱包围的一天呀", showText: "你值得所有美好" },
+        { emoji: "🤕", name: "不舒服", text: "好好照顾自己呀", showText: "要好好爱自己" }
+    ];
+
+    let currentDate = new Date();
+    let currentYear = currentDate.getFullYear();
+    let currentMonth = currentDate.getMonth();
+    let today = new Date();
+    let moodMap = {};   // 存储日期->表情
+
+    function formatDate(date) {
+        let y = date.getFullYear();
+        let m = (date.getMonth()+1).toString().padStart(2,'0');
+        let d = date.getDate().toString().padStart(2,'0');
+        return `${y}-${m}-${d}`;
+    }
+
+    // 加载当月心情
+    async function loadMoodRange() {
+        const start = `${currentYear}-${(currentMonth+1).toString().padStart(2,'0')}-01`;
+        const lastDay = new Date(currentYear, currentMonth+1, 0).getDate();
+        const end = `${currentYear}-${(currentMonth+1).toString().padStart(2,'0')}-${lastDay}`;
+        try {
+            const resp = await fetch(`/api/mood/range?userId=${USER_ID}&start=${start}&end=${end}`);
+            const data = await resp.json();
+            if(data.success) {
+                moodMap = {};
+                data.data.forEach(item => { moodMap[item.recordDate] = item.emoji; });
+                renderCalendar();
+            } else { alert("加载心情失败"); }
+        } catch(e) { alert("网络错误: " + e.message); }
+    }
+
+    // 保存心情
+    async function saveMood(emoji, date) {
+        try {
+            const resp = await fetch(`/api/mood/save?userId=${USER_ID}&date=${formatDate(date)}&emoji=${encodeURIComponent(emoji)}`, { method: 'POST' });
+            const data = await resp.json();
+            if(data.success) {
+                moodMap[formatDate(date)] = emoji;
+                renderCalendar();
+                // 更新右侧大表情
+                document.getElementById('showEmoji').innerText = emoji;
+                const moodItem = moodData.find(m => m.emoji === emoji);
+                if(moodItem) document.getElementById('showText').innerText = moodItem.showText;
+                return true;
+            } else { alert("保存失败"); return false; }
+        } catch(e) { alert("网络错误: " + e.message); return false; }
+    }
+
+    // 加载日记
+    async function loadDiary(date) {
+        try {
+            const resp = await fetch(`/api/diary/get?userId=${USER_ID}&date=${formatDate(date)}`);
+            const data = await resp.json();
+            if(data.success && data.data) return data.data.content || "";
+            return "";
+        } catch(e) { return ""; }
+    }
+
+    // 保存日记
+    async function saveDiary(content, date) {
+        try {
+            const resp = await fetch(`/api/diary/save?userId=${USER_ID}&date=${formatDate(date)}&content=${encodeURIComponent(content)}`, { method: 'POST' });
+            const data = await resp.json();
+            return data.success;
+        } catch(e) { alert("保存日记错误"); return false; }
+    }
+
+    // 删除日记（清空）
+    async function deleteDiary(date) { return await saveDiary("", date); }
+
+    // 渲染日历
+    function renderCalendar() {
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        const startWeekday = firstDay.getDay();
+        const daysInMonth = new Date(currentYear, currentMonth+1, 0).getDate();
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+        const weekdays = ['日','一','二','三','四','五','六'];
+        weekdays.forEach(day => {
+            let d = document.createElement('div');
+            d.className = 'calendar-day-title';
+            d.innerText = day;
+            grid.appendChild(d);
+        });
+        for(let i=0;i<startWeekday;i++) {
+            let empty = document.createElement('div');
+            grid.appendChild(empty);
+        }
+        for(let i=1;i<=daysInMonth;i++) {
+            let date = new Date(currentYear, currentMonth, i);
+            let isToday = (date.toDateString() === today.toDateString());
+            let isActive = (date.toDateString() === currentDate.toDateString());
+            let cell = document.createElement('div');
+            cell.className = 'calendar-date';
+            if(isToday) cell.classList.add('today');
+            if(isActive) cell.classList.add('active');
+            cell.innerText = i;
+            let dateStr = formatDate(date);
+            if(moodMap[dateStr]) {
+                let mark = document.createElement('span');
+                mark.className = 'mood-mark';
+                mark.innerText = moodMap[dateStr];
+                cell.appendChild(mark);
+            }
+            cell.onclick = (function(d){ return function() { selectDate(d); }; })(date);
+            grid.appendChild(cell);
+        }
+        document.getElementById('calendarHeader').innerHTML = `${currentYear}年 ${currentMonth+1}月`;
+    }
+
+    async function selectDate(date) {
+        currentDate = date;
+        renderCalendar();
+        let dateStr = formatDate(date);
+        let emoji = moodMap[dateStr];
+        if(emoji) {
+            document.getElementById('showEmoji').innerText = emoji;
+            let moodItem = moodData.find(m => m.emoji === emoji);
+            if(moodItem) document.getElementById('showText').innerText = moodItem.showText;
+        } else {
+            document.getElementById('showEmoji').innerText = "📅";
+            document.getElementById('showText').innerText = "无记录";
+        }
+        let diaryContent = await loadDiary(date);
+        document.getElementById('diaryInput').value = diaryContent;
+    }
+
+    function closePopup() {
+        document.getElementById('moodMask').style.display = 'none';
+    }
+
+    // 初始化心情列表
+    function initMoodList() {
+        const container = document.getElementById('moodList');
+        moodData.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'mood-item';
+            div.innerHTML = `<div class="mood-emoji">${item.emoji}</div><div class="mood-text">${item.name}</div>`;
+            div.onclick = async () => {
+                document.getElementById('popEmoji').innerText = item.emoji;
+                document.getElementById('popSay').innerText = item.text;
+                document.getElementById('moodMask').style.display = 'flex';
+                await saveMood(item.emoji, currentDate);
+            };
+            container.appendChild(div);
+        });
+    }
+
+    // 侧边栏跳转
+    const pageMap = {
+        "首页": "zy.html","心理咨询":"xlzx.html","心情记录":"xqjl.html","治愈vera":"vera.html",
+        "答案之书":"dazs.html","心理测试":"xlcs.html","治愈工具":"zygj.html","个人数据":"grsj.html"
+    };
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        const text = item.innerText.trim();
+        if(pageMap[text] && text !== "心情记录") {
+            item.addEventListener('click', () => window.location.href = pageMap[text]);
+        }
+    });
+
+    // 绑定日记按钮
+    document.getElementById('saveDiaryBtn').onclick = async () => {
+        let content = document.getElementById('diaryInput').value;
+        let success = await saveDiary(content, currentDate);
+        alert(success ? "保存成功" : "保存失败");
+    };
+    document.getElementById('delDiaryBtn').onclick = async () => {
+        if(confirm("清空日记？")) {
+            let success = await deleteDiary(currentDate);
+            if(success) {
+                document.getElementById('diaryInput').value = "";
+                alert("已清空");
+            } else alert("清空失败");
+        }
+    };
+
+    // 搜索功能 (保留)
+    function searchPage() {
+        let kw = document.getElementById('searchInput').value.trim();
+        if(!kw) return;
+        alert("搜索功能暂未接入");
+    }
+    document.getElementById('searchInput').addEventListener('keypress', e => { if(e.key === 'Enter') searchPage(); });
+
+    // 页面启动
+    (async () => {
+        await loadMoodRange();
+        initMoodList();
+        await selectDate(currentDate);
+    })();
+</script>
+</body>
+</html>

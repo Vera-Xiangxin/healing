@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8">
+		<title>治愈Vera AI聊天</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+				font-family: "微软雅黑", sans-serif;
+			}
+
+			body {
+				background: #e6fffd;
+			}
+
+			.top-header {
+				width: 100%;
+				height: 70px;
+				background: #40e9e0;
+				display: flex;
+				align-items: center;
+				padding: 0 30px;
+				position: fixed;
+				top: 0;
+				left: 0;
+				z-index: 99;
+				gap: 20px;
+			}
+
+			.logo-title {
+				font-size: 24px;
+				font-weight: bold;
+				color: #fff;
+				white-space: nowrap;
+			}
+
+			.search-bar {
+				flex: 1;
+				max-width: 600px;
+				height: 40px;
+				border-radius: 20px;
+				border: none;
+				padding: 0 20px;
+				font-size: 16px;
+			}
+
+			.container {
+				display: flex;
+				margin-top: 70px;
+			}
+
+			.sidebar {
+				width: 180px;
+				background-color: #a0f7f2;
+				min-height: calc(100vh - 70px);
+				padding-top: 30px;
+				position: fixed;
+				left: 0;
+				top: 70px;
+			}
+			
+			.sidebar-item {
+				font-size: 26px;
+				padding: 18px 20px;
+				color: #ffffff;
+				cursor: pointer;
+				transition: 0.2s;
+				text-align: center;
+			}
+			
+			.sidebar-item.active {
+				color: #ffbc2e;
+				font-weight: bold;
+			}
+
+			.chat-wrap {
+				margin-left: 180px;
+				width: calc(100% - 180px);
+				height: calc(100vh - 70px);
+				display: flex;
+			}
+
+			.chat-left {
+				width: 200px;
+				background: #c7f9f6;
+				border-right: 1px solid #40e9e0;
+				padding: 20px;
+			}
+
+			.new-chat-btn {
+				border: 1px solid #40e9e0;
+				border-radius: 20px;
+				padding: 8px 16px;
+				cursor: pointer;
+				font-size: 20px;
+				display: inline-block;
+			}
+
+			.chat-right {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				padding: 30px;
+			}
+
+			.chat-content {
+				flex: 1;
+				overflow-y: auto;
+				padding-bottom: 20px;
+			}
+
+			.msg-row {
+				width: 100%;
+				margin: 16px 0;
+				display: flex;
+			}
+
+			.user-msg {
+				justify-content: flex-end;
+			}
+
+			.ai-msg {
+				justify-content: flex-start;
+			}
+
+			.user-bubble {
+				max-width: 60%;
+				background: #40e9e0;
+				color: #fff;
+				padding: 12px 18px;
+				border-radius: 18px 18px 0 18px;
+				font-size: 17px;
+			}
+
+			.ai-bubble {
+				max-width: 60%;
+				background: #fff;
+				color: #333;
+				padding: 12px 18px;
+				border-radius: 18px 18px 18px 0;
+				font-size: 17px;
+				box-shadow: 0 2px 5px #ddd;
+			}
+
+			.loading {
+				color: #888;
+				font-size: 16px;
+			}
+
+			.input-area {
+				display: flex;
+				gap: 12px;
+				padding: 15px;
+				border-radius: 25px;
+				border: 1px solid #40e9e0;
+				background: #e6fffd;
+			}
+
+			.chat-input {
+				flex: 1;
+				border: none;
+				outline: none;
+				background: transparent;
+				font-size: 17px;
+			}
+
+			.send-btn {
+				width: 50px;
+				height: 40px;
+				border: none;
+				background: transparent;
+				cursor: pointer;
+				font-size: 30px;
+				color: #40e9e0;
+			}
+
+			.highlight {
+				background-color: #ffeb3b;
+				transition: background 0.3s;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="top-header">
+			<div class="logo-title">《治愈维拉》</div>
+			<input type="text" class="search-bar" id="searchInput" placeholder="搜索页面内容...">
+		</div>
+		<div class="container">
+			<div class="sidebar">
+				<div class="sidebar-item">首页</div>
+				<div class="sidebar-item">心理咨询</div>
+				<div class="sidebar-item">心情记录</div>
+				<div class="sidebar-item active">治愈vera</div>
+				<div class="sidebar-item">答案之书</div>
+				<div class="sidebar-item">心理测试</div>
+				<div class="sidebar-item">治愈工具</div>
+				<div class="sidebar-item">个人数据</div>
+			</div>
+			<div class="chat-wrap">
+				<div class="chat-left">
+					<div class="new-chat-btn" onclick="newChat()">开启新对话</div>
+				</div>
+				<div class="chat-right">
+					<div class="chat-content" id="chatBox"></div>
+					<div class="input-area">
+						<input type="text" class="chat-input" id="msgInput" placeholder="给Vera发消息">
+						<button class="send-btn" onclick="sendMsg()">⬆</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			const res = await fetch("/api/vera/chat", {
+    			method: "POST",
+   				 headers: { "Content-Type": "application/json" },
+    			body: JSON.stringify({ message: msg, history: historyMsg })
+			});
+			let historyMsg = [{
+				"role": "system",
+				"content": "你叫Vera，是温柔治愈的心理陪伴AI。永远共情、耐心倾听，语气温软治愈，先安抚情绪，温柔开导，不说生硬大道理，一直陪伴、包容用户。"
+			}];
+			const chatBox = document.getElementById('chatBox');
+			const msgInput = document.getElementById('msgInput');
+			const backupReply = [
+				"没关系，我一直在这里陪着你💚",
+				"辛苦你啦，有什么不开心都可以和我说",
+				"慢慢来，一切都会慢慢变轻松的✨",
+				"抱抱你，你已经真的很棒了",
+				"放轻松，我会一直耐心听你讲~"
+			];
+			async function sendMsg() {
+				let msg = msgInput.value.trim();
+				if (!msg) return;
+				chatBox.innerHTML += `<div class="msg-row user-msg"><div class="user-bubble">${msg}</div></div>`;
+				msgInput.value = '';
+				chatBox.scrollTop = chatBox.scrollHeight;
+				let loadingId = 'loading' + Date.now();
+				chatBox.innerHTML +=
+					`<div class="msg-row ai-msg" id="${loadingId}"><div class="ai-bubble loading">Vera正在倾听与思考...</div></div>`;
+				chatBox.scrollTop = chatBox.scrollHeight;
+				historyMsg.push({
+					"role": "user",
+					"content": msg
+				});
+				try {
+					const res = await fetch("https://api.zukijourney.com/v1/chat/completions", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							"Authorization": `Bearer ${AccessKeyId+SecretAccessKey}`
+						},
+						body: JSON.stringify({
+							model: "doubao-lite-4k",
+							messages: historyMsg,
+							temperature: 0.75
+						})
+					});
+					if (!res.ok) throw Error("接口暂不可用");
+					const data = await res.json();
+					document.getElementById(loadingId).remove();
+					let aiContent = data.choices[0].message.content;
+					historyMsg.push({
+						"role": "assistant",
+						"content": aiContent
+					});
+					chatBox.innerHTML += `<div class="msg-row ai-msg"><div class="ai-bubble">${aiContent}</div></div>`;
+					chatBox.scrollTop = chatBox.scrollHeight;
+				} catch (err) {
+					console.log(err);
+					document.getElementById(loadingId).remove();
+					let randomText = backupReply[Math.floor(Math.random() * backupReply.length)];
+					chatBox.innerHTML += `<div class="msg-row ai-msg"><div class="ai-bubble">${randomText}</div></div>`;
+					chatBox.scrollTop = chatBox.scrollHeight;
+				}
+			}
+
+			function newChat() {
+				if (confirm("确定开启全新对话吗？")) {
+					chatBox.innerHTML = '';
+					historyMsg = [{
+						"role": "system",
+						"content": "你叫Vera，是温柔治愈的心理陪伴AI。永远共情、耐心倾听，语气温软治愈，先安抚情绪，温柔开导，不说生硬大道理，一直陪伴、包容用户。"
+					}];
+				}
+			}
+			msgInput.addEventListener('keydown', e => {
+				if (e.key === 'Enter') sendMsg();
+			});
+
+			const pageMap = {
+				"首页": "zy.html",
+				"心理咨询": "xlzx.html",
+				"心情记录": "xqjl.html",
+				"治愈vera": "vera.html",
+				"答案之书": "dazs.html",
+				"心理测试": "xlcs.html",
+				"治愈工具": "zygj.html",
+				"个人数据": "grsj.html"
+			};
+			document.querySelectorAll('.sidebar-item').forEach(item => {
+				const text = item.innerText.trim();
+				if (pageMap[text] && text !== "治愈vera") {
+					item.addEventListener('click', () => {
+						location.href = pageMap[text];
+					});
+				}
+			});
+
+			function searchPage() {
+				const keyword = document.getElementById('searchInput').value.trim();
+				if (!keyword) return;
+				document.querySelectorAll('.highlight').forEach(el => el.classList.remove('highlight'));
+				const mainArea = document.querySelector('.chat-wrap');
+				if (!mainArea) return;
+				const walker = document.createTreeWalker(mainArea, NodeFilter.SHOW_TEXT, {
+					acceptNode: (node) => {
+						if (node.parentElement.tagName === 'SCRIPT' || node.parentElement.tagName === 'STYLE')
+						return NodeFilter.FILTER_REJECT;
+						return NodeFilter.FILTER_ACCEPT;
+					}
+				});
+				let firstMatch = null;
+				while (walker.nextNode()) {
+					const node = walker.currentNode;
+					if (node.textContent.toLowerCase().includes(keyword.toLowerCase())) {
+						firstMatch = node.parentElement;
+						break;
+					}
+				}
+				if (firstMatch) {
+					firstMatch.classList.add('highlight');
+					firstMatch.scrollIntoView({
+						behavior: 'smooth',
+						block: 'center'
+					});
+				} else {
+					alert('未找到相关内容');
+				}
+			}
+			document.getElementById('searchInput').addEventListener('keypress', (e) => {
+				if (e.key === 'Enter') searchPage();
+			});
+		</script>
+	</body>
+</html>

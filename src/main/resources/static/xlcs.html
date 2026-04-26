@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8">
+		<title>心理测试</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+				font-family: "微软雅黑", sans-serif;
+			}
+
+			body {
+				background-color: #cbf7f5;
+			}
+
+			.top-search-bar {
+				background-color: #40e0d0;
+				height: 70px;
+				display: flex;
+				align-items: center;
+				padding: 0 30px;
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				z-index: 99;
+				gap: 20px;
+			}
+			
+			.logo-title {
+				font-size: 24px;
+				font-weight: bold;
+				color: #fff;
+				white-space: nowrap;
+			}
+			
+			.search-input {
+				flex: 1;
+				max-width: 600px;
+				height: 40px;
+				border-radius: 20px;
+				border: none;
+				padding: 0 20px;
+				font-size: 16px;
+			}
+
+
+			.container {
+				display: flex;
+			}
+
+			.sidebar {
+				width: 180px;
+				background-color: #a0f7f2;
+				min-height: calc(100vh - 70px);
+				padding-top: 30px;
+				position: fixed;
+				left: 0;
+				top: 70px;
+			}
+			
+			.sidebar-item {
+				font-size: 26px;
+				padding: 18px 20px;
+				color: #ffffff;
+				cursor: pointer;
+				transition: 0.2s;
+				text-align: center;
+			}
+			
+			.sidebar-item.active {
+				color: #ffbc2e;
+				font-weight: bold;
+			}
+			
+			.sidebar-item:hover {
+				color: #ffbc2e;
+			}
+			
+			.main-content {
+				margin-left: 180px;
+				flex: 1;
+				padding: 30px 40px;
+			}
+
+			.page-title {
+				font-size: 32px;
+				color: #333;
+				margin-bottom: 30px;
+				text-align: center;
+			}
+
+			/* 升级：3列布局 */
+			.test-grid {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 22px;
+				max-width: 1100px;
+				margin: 0 auto;
+			}
+
+			.test-card {
+				background: #fff;
+				border-radius: 20px;
+				border: 2px solid #58e9dd;
+				padding: 25px;
+				cursor: pointer;
+				transition: transform 0.2s;
+			}
+
+			.test-card:hover {
+				transform: scale(1.03);
+				border-color: #ffbc2e;
+			}
+
+			.test-card h3 {
+				font-size: 21px;
+				margin-bottom: 10px;
+				color: #222;
+			}
+
+			.test-card p {
+				font-size: 15px;
+				color: #666;
+				line-height: 1.5;
+				margin-bottom: 15px;
+			}
+
+			.test-tag {
+				display: inline-block;
+				background: #a5efea;
+				padding: 4px 10px;
+				border-radius: 10px;
+				font-size: 13px;
+				margin-right: 6px;
+				margin-bottom: 5px;
+			}
+
+			/* 弹窗 */
+			.modal {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.5);
+				display: none;
+				align-items: center;
+				justify-content: center;
+				z-index: 999;
+			}
+
+			.modal-box {
+				background: #fff;
+				width: 90%;
+				max-width: 650px;
+				border-radius: 20px;
+				padding: 30px;
+				max-height: 85vh;
+				overflow-y: auto;
+				position: relative;
+			}
+
+			.close-btn {
+				position: absolute;
+				right: 20px;
+				top: 15px;
+				font-size: 24px;
+				cursor: pointer;
+				color: #666;
+			}
+
+			.modal-title {
+				font-size: 24px;
+				margin-bottom: 20px;
+				text-align: center;
+			}
+
+			.question {
+				margin: 18px 0;
+				font-size: 17px;
+			}
+
+			.options {
+				margin: 10px 0;
+			}
+
+			.option {
+				margin: 8px 0;
+				font-size: 16px;
+			}
+
+			.btn {
+				background: #40e0d0;
+				color: #fff;
+				border: none;
+				padding: 12px 28px;
+				border-radius: 10px;
+				font-size: 16px;
+				cursor: pointer;
+				margin-top: 20px;
+				display: block;
+				margin-left: auto;
+				margin-right: auto;
+			}
+
+			.result {
+				text-align: center;
+				font-size: 18px;
+				padding: 25px 15px;
+				line-height: 1.8;
+			}
+		</style>
+	</head>
+	<body>
+
+		<!-- 顶部搜索 -->
+		<div class="top-search-bar">
+			<div class="logo-title">《治愈维拉》</div>
+			<input type="text" class="search-input" placeholder="搜索测试">
+		</div>
+
+		<div class="container">
+			<!-- 左侧导航 -->
+			<div class="sidebar">
+				<div class="sidebar-item">首页</div>
+				<div class="sidebar-item">心理咨询</div>
+				<div class="sidebar-item">心情记录</div>
+				<div class="sidebar-item">治愈vera</div>
+				<div class="sidebar-item">答案之书</div>
+				<div class="sidebar-item active">心理测试</div>
+				<div class="sidebar-item">治愈工具</div>
+				<div class="sidebar-item">个人数据</div>
+			</div>
+
+			<!-- 主内容 -->
+			<div class="main-content">
+				<h2 class="page-title">🧩 心理测试专区</h2>
+
+				<div class="test-grid">
+					<div class="test-card" onclick="startTest('stress')">
+						<h3>压力水平测试</h3>
+						<p>全面评估你当前的精神压力与疲劳程度。</p>
+						<span class="test-tag">情绪</span><span class="test-tag">压力</span>
+					</div>
+					<div class="test-card" onclick="startTest('happy')">
+						<h3>幸福感测试</h3>
+						<p>测量你的幸福指数与生活满意度。</p>
+						<span class="test-tag">治愈</span><span class="test-tag">心态</span>
+					</div>
+					<div class="test-card" onclick="startTest('personality')">
+						<h3>性格特质测试</h3>
+						<p>深度解析你的内在性格与行为模式。</p>
+						<span class="test-tag">性格</span><span class="test-tag">自我认知</span>
+					</div>
+					<div class="test-card" onclick="startTest('anxiety')">
+						<h3>焦虑情绪测试</h3>
+						<p>检测焦虑水平，及时关注心理健康。</p>
+						<span class="test-tag">情绪</span><span class="test-tag">心理</span>
+					</div>
+					<div class="test-card" onclick="startTest('love')">
+						<h3>恋爱观测试</h3>
+						<p>了解你的爱情态度与亲密关系模式。</p>
+						<span class="test-tag">情感</span><span class="test-tag">恋爱</span>
+					</div>
+					<div class="test-card" onclick="startTest('sleep')">
+						<h3>睡眠质量测试</h3>
+						<p>评估你的睡眠状态与健康风险。</p>
+						<span class="test-tag">健康</span><span class="test-tag">睡眠</span>
+					</div>
+					<div class="test-card" onclick="startTest('confidence')">
+						<h3>自信心测试</h3>
+						<p>看看你的自我价值感与底气有多强。</p>
+						<span class="test-tag">成长</span><span class="test-tag">自信</span>
+					</div>
+					<div class="test-card" onclick="startTest('anger')">
+						<h3>情绪控制测试</h3>
+						<p>检测你的情绪稳定度与易怒程度。</p>
+						<span class="test-tag">情绪</span><span class="test-tag">自控</span>
+					</div>
+					<div class="test-card" onclick="startTest('motivation')">
+						<h3>动力水平测试</h3>
+						<p>评估你的行动力、热情与目标感。</p>
+						<span class="test-tag">成长</span><span class="test-tag">动力</span>
+					</div>
+					<div class="test-card" onclick="startTest('empathy')">
+						<h3>同理心测试</h3>
+						<p>测量你的共情能力与温暖指数。</p>
+						<span class="test-tag">性格</span><span class="test-tag">治愈</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 测试弹窗 -->
+		<div class="modal" id="testModal">
+			<div class="modal-box">
+				<span class="close-btn" onclick="closeModal()">×</span>
+				<div class="modal-title" id="modalTitle"></div>
+				<div id="testContent"></div>
+				<button class="btn" onclick="showResult()">查看结果</button>
+			</div>
+		</div>
+
+		<script>
+			// 导航跳转
+			const pageMap = {
+				"首页": "zy.html",
+				"心理咨询": "xlzx.html",
+				"心情记录": "xqjl.html",
+				"治愈vera": "vera.html",
+				"答案之书": "dazs.html",
+				"心理测试": "xlcs.html",
+				"治愈工具": "zygj.html",
+				"个人数据": "grsj.html"
+			};
+			document.querySelectorAll('.sidebar-item').forEach(item => {
+				const text = item.innerText.trim();
+				if (pageMap[text]) {
+					item.addEventListener('click', () => {
+						location.href = pageMap[text];
+					});
+				}
+			});
+
+			// 10大心理测试题库（每题8题，更精准）
+			const tests = {
+				stress: {
+					title: "压力水平测试",
+					questions: [
+						"最近是否经常感到疲惫不堪？",
+						"是否容易烦躁、发脾气？",
+						"睡眠质量是否下降？",
+						"是否对很多事情失去兴趣？",
+						"是否经常感到心慌或紧张？",
+						"是否难以放松、静不下来？",
+						"是否经常头痛或身体不适？",
+						"是否觉得生活负担很重？"
+					],
+					result(a) {
+						let s = a.reduce((t, v) => t + v, 0);
+						if (s <= 10) return "🍃 压力极低，你非常放松自在！";
+						if (s <= 16) return "🌿 压力正常，保持良好节奏即可。";
+						if (s <= 24) return "⚠️ 压力偏高，需要及时休息放松。";
+						return "🔥 压力过载！请立刻给自己减负休息。";
+					}
+				},
+				happy: {
+					title: "幸福感测试",
+					questions: [
+						"你对现在的生活满意吗？",
+						"你经常感到快乐吗？",
+						"你觉得自己被爱着吗？",
+						"你对未来充满希望吗？",
+						"你能接纳自己的不完美吗？",
+						"你经常感受到生活中的美好吗？",
+						"你有可以信任的人吗？",
+						"你觉得人生有意义吗？"
+					],
+					result(a) {
+						let s = a.reduce((t, v) => t + v, 0);
+						if (s >= 25) return "🌟 幸福感爆棚！你活在爱与光里！";
+						if (s >= 18) return "😊 幸福感优秀，生活温暖又美好。";
+						if (s >= 12) return "🌱 幸福感一般，多关注小确幸。";
+						return "💛 你值得被爱，慢慢找回快乐吧。";
+					}
+				},
+				personality: {
+					title: "性格特质测试",
+					questions: [
+						"你更喜欢独处还是热闹？",
+						"遇到问题你习惯理性思考还是感性感受？",
+						"你做事喜欢计划还是随性？",
+						"你更容易注意细节还是整体？",
+						"你面对新环境会紧张还是兴奋？",
+						"你更愿意倾听还是表达？",
+						"你做事偏谨慎还是勇敢？",
+						"你更喜欢稳定还是变化？"
+					],
+					result() {
+						return "🌿 你是温柔、细腻、有同理心的治愈型人格！你善良、重感情、懂得照顾他人，也请一定好好爱自己。";
+					}
+				},
+				anxiety: {
+					title: "焦虑情绪测试",
+					questions: [
+						"是否经常担心很多事情？",
+						"是否容易心跳加快、呼吸急促？",
+						"是否难以放松、静不下来？",
+						"是否容易往坏处想？",
+						"是否经常感到不安？",
+						"是否容易胡思乱想、无法控制？",
+						"是否感到胸闷或头晕？",
+						"是否对未来感到恐慌？"
+					],
+					result(a) {
+						let s = a.reduce((t, v) => t + v, 0);
+						if (s <= 10) return "🍃 无焦虑，情绪超级稳定！";
+						if (s <= 16) return "🌿 轻微焦虑，正常情绪波动。";
+						if (s <= 24) return "⚠️ 中度焦虑，记得多放松自己。";
+						return "❤️ 焦虑明显，允许自己慢下来，你很棒。";
+					}
+				},
+				love: {
+					title: "恋爱观测试",
+					questions: [
+						"你相信真爱吗？",
+						"你在感情中容易缺乏安全感吗？",
+						"你愿意为爱情妥协吗？",
+						"你更看重陪伴还是激情？",
+						"你会主动表达爱意吗？",
+						"你害怕受伤而不敢爱吗？",
+						"你希望感情稳定还是自由？",
+						"你觉得自己值得被爱吗？"
+					],
+					result() {
+						return "💞 你拥有真诚温柔的恋爱观！你重感情、懂珍惜，适合被坚定选择、长久偏爱。好的爱情正在奔向你。";
+					}
+				},
+				sleep: {
+					title: "睡眠质量测试",
+					questions: [
+						"你入睡困难吗？",
+						"你经常半夜醒来吗？",
+						"你醒来后感到疲惫吗？",
+						"你会熬夜或作息混乱吗？",
+						"你睡前容易胡思乱想吗？",
+						"你白天精神状态差吗？",
+						"你依赖手机才能入睡吗？",
+						"你经常做噩梦吗？"
+					],
+					result(a) {
+						let s = a.reduce((t, v) => t + v, 0);
+						if (s <= 10) return "😴 睡眠质量优秀，身体恢复很好！";
+						if (s <= 16) return "🌙 睡眠正常，稍微注意作息即可。";
+						if (s <= 24) return "⚠️ 睡眠不佳，需要调整作息。";
+						return "🛌 严重失眠！请重视睡眠健康。";
+					}
+				},
+				confidence: {
+					title: "自信心测试",
+					questions: [
+						"你相信自己能做好事情吗？",
+						"你敢于表达自己的想法吗？",
+						"你能坦然接受赞美吗？",
+						"你面对挑战会退缩吗？",
+						"你经常否定自己吗？",
+						"你在意别人的评价吗？",
+						"你觉得自己很有价值吗？",
+						"你敢于拒绝别人吗？"
+					],
+					result(a) {
+						let s = a.reduce((t, v) => t + v, 0);
+						if (s >= 25) return "☀️ 自信爆棚！你气场强大、闪闪发光！";
+						if (s >= 18) return "💪 自信良好，你非常优秀！";
+						if (s >= 12) return "🌱 自信一般，多肯定自己一点。";
+						return "✨ 你远比想象中更好，慢慢建立自信吧。";
+					}
+				},
+				anger: {
+					title: "情绪控制测试",
+					questions: [
+						"你容易生气吗？",
+						"你会忍不住发脾气吗？",
+						"生气后你会后悔吗？",
+						"你能冷静处理矛盾吗？",
+						"你会压抑情绪吗？",
+						"小事会让你烦躁吗？",
+						"你能快速平复情绪吗？",
+						"你会伤害自己或他人吗？"
+					],
+					result(a) {
+						let s = a.reduce((t, v) => t + v, 0);
+						if (s <= 10) return "🌊 情绪极度稳定，温柔又平和！";
+						if (s <= 16) return "☁️ 情绪正常，偶尔波动很正常。";
+						if (s <= 24) return "🌪️ 情绪易波动，需要学会调节。";
+						return "🔥 情绪容易失控，记得好好爱自己。";
+					}
+				},
+				motivation: {
+					title: "动力水平测试",
+					questions: [
+						"你有明确的目标吗？",
+						"你能坚持完成计划吗？",
+						"你经常感到颓废吗？",
+						"你对新鲜事物有热情吗？",
+						"你愿意主动努力吗？",
+						"你容易拖延吗？",
+						"你相信未来会更好吗？",
+						"你能从休息中恢复能量吗？"
+					],
+					result(a) {
+						let s = a.reduce((t, v) => t + v, 0);
+						if (s >= 25) return "🚀 动力满格！你积极向上、未来可期！";
+						if (s >= 18) return "☀️ 动力良好，保持节奏就很棒。";
+						if (s >= 12) return "🌱 动力一般，适当充电即可。";
+						return "🌿 允许自己休息，能量会慢慢回来。";
+					}
+				},
+				empathy: {
+					title: "同理心测试",
+					questions: [
+						"你能感受到别人的情绪吗？",
+						"你愿意倾听他人烦恼吗？",
+						"你看到别人难过会心疼吗？",
+						"你会包容别人的缺点吗？",
+						"你说话会考虑别人感受吗？",
+						"你能理解不同的观点吗？",
+						"你会主动关心别人吗？",
+						"你觉得世界需要更多温柔吗？"
+					],
+					result(a) {
+						let s = a.reduce((t, v) => t + v, 0);
+						if (s >= 25) return "💖 共情满分！你是天使般温暖治愈的人！";
+						if (s >= 18) return "🌸 同理心优秀，你温柔又善良。";
+						if (s >= 12) return "🌼 共情正常，有自己的边界也很好。";
+						return "🌱 可以试着多感受温柔，世界很爱你。";
+					}
+				}
+			};
+
+			let currentTest = null;
+			let answers = [];
+
+			// 开始测试
+			function startTest(type) {
+				currentTest = tests[type];
+				answers = [];
+				document.getElementById("modalTitle").innerText = currentTest.title;
+				let html = "";
+				currentTest.questions.forEach((q, i) => {
+					html += `
+            <div class="question">${i+1}. ${q}</div>
+            <div class="options">
+                <label class="option"><input type="radio" name="q${i}" value="1" required> 完全没有</label>
+                <label class="option"><input type="radio" name="q${i}" value="2"> 偶尔</label>
+                <label class="option"><input type="radio" name="q${i}" value="3"> 经常</label>
+                <label class="option"><input type="radio" name="q${i}" value="4"> 总是</label>
+            </div>`;
+				});
+				document.getElementById("testContent").innerHTML = html;
+				document.getElementById("testModal").style.display = "flex";
+			}
+
+			// 查看结果
+			function showResult() {
+				let ans = [];
+				let valid = true;
+				currentTest.questions.forEach((_, i) => {
+					const sel = document.querySelector(`input[name="q${i}"]:checked`);
+					if (!sel) valid = false;
+					else ans.push(+sel.value);
+				});
+				if (!valid) {
+					alert("请完成所有题目～");
+					return;
+				}
+				answers = ans;
+				let res = currentTest.result(answers);
+				document.getElementById("testContent").innerHTML = `<div class="result">${res}</div>`;
+			}
+
+			// 关闭弹窗（新增功能）
+			function closeModal() {
+				document.getElementById("testModal").style.display = "none";
+			}
+		</script>
+
+	</body>
+</html>

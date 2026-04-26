@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8">
+		<title>心理咨询页面</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+				font-family: "微软雅黑", sans-serif;
+			}
+
+			body {
+				background-color: #e6fffd;
+			}
+
+			.top-header {
+				background-color: #40e9e0;
+				height: 70px;
+				display: flex;
+				align-items: center;
+				padding: 0 30px;
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				z-index: 99;
+				gap: 20px;
+			}
+
+			.logo-title {
+				font-size: 24px;
+				font-weight: bold;
+				color: #fff;
+				white-space: nowrap;
+			}
+
+			.search-bar {
+				flex: 1;
+				max-width: 600px;
+				height: 40px;
+				border-radius: 20px;
+				border: none;
+				padding: 0 20px;
+				font-size: 16px;
+			}
+
+			.register-btn {
+				position: absolute;
+				right: 30px;
+				color: #ff3333;
+				font-size: 22px;
+				font-weight: bold;
+				cursor: pointer;
+			}
+
+			.container {
+				display: flex;
+				margin-top: 70px;
+			}
+
+			.sidebar {
+				width: 180px;
+				background-color: #a0f7f2;
+				min-height: calc(100vh - 70px);
+				padding-top: 30px;
+				position: fixed;
+				left: 0;
+				top: 70px;
+			}
+			
+			.sidebar-item {
+				font-size: 26px;
+				padding: 18px 20px;
+				color: #ffffff;
+				cursor: pointer;
+				transition: 0.2s;
+				text-align: center;
+			}
+			
+			.sidebar-item.active {
+				color: #ffbc2e;
+				font-weight: bold;
+			}
+
+			.main-box {
+				flex: 1;
+				margin-left: 180px;
+				padding: 40px 60px;
+			}
+
+			.page-title {
+				font-size: 36px;
+				margin-bottom: 40px;
+				color: #111;
+			}
+
+			.doctor-grid {
+				display: grid;
+				grid-template-columns: repeat(5, 1fr);
+				gap: 40px;
+			}
+
+			.doctor-card {
+				cursor: pointer;
+				transition: 0.3s;
+			}
+
+			.doctor-card:hover {
+				transform: translateY(-5px);
+				opacity: 0.9;
+			}
+
+			.avatar-box {
+				width: 100%;
+				aspect-ratio: 1 / 1.1;
+				background-color: #40e9e0;
+				border-radius: 30px;
+				overflow: hidden;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.avatar-img {
+				width: 80%;
+				border-radius: 20px;
+				object-fit: cover;
+			}
+
+			.doctor-info {
+				margin-top: 12px;
+				font-size: 18px;
+				line-height: 1.6;
+				text-align: center;
+			}
+
+			.chat-page {
+				display: none;
+				position: fixed;
+				top: 70px;
+				left: 180px;
+				right: 0;
+				bottom: 0;
+				background-color: #e6fffd;
+				flex-direction: column;
+				z-index: 90;
+			}
+
+			.chat-header {
+				background-color: #40e9e0;
+				height: 60px;
+				display: flex;
+				align-items: center;
+				padding: 0 20px;
+				font-size: 24px;
+				font-weight: bold;
+				color: #fff;
+			}
+
+			.back-btn {
+				cursor: pointer;
+				margin-right: 30px;
+				color: #fff;
+			}
+
+			.chat-content {
+				flex: 1;
+				padding: 30px;
+				overflow-y: auto;
+				background-color: #f0fffd;
+			}
+
+			.msg-row {
+				width: 100%;
+				margin-bottom: 20px;
+				display: flex;
+			}
+
+			.user-msg {
+				justify-content: flex-end;
+			}
+
+			.user-bubble {
+				max-width: 60%;
+				background-color: #40e9e0;
+				color: #fff;
+				padding: 12px 18px;
+				border-radius: 18px 18px 0 18px;
+				font-size: 16px;
+				line-height: 1.5;
+			}
+
+			.doctor-msg {
+				justify-content: flex-start;
+			}
+
+			.doctor-bubble {
+				max-width: 60%;
+				background-color: #ffffff;
+				color: #333;
+				padding: 12px 18px;
+				border-radius: 18px 18px 18px 0;
+				font-size: 16px;
+				line-height: 1.5;
+				box-shadow: 0 2px 5px #ddd;
+			}
+
+			.chat-input-area {
+				height: 70px;
+				background-color: #fff;
+				display: flex;
+				align-items: center;
+				padding: 0 20px;
+				gap: 15px;
+			}
+
+			.chat-input {
+				flex: 1;
+				height: 40px;
+				border-radius: 20px;
+				border: 1px solid #ccc;
+				padding: 0 20px;
+				outline: none;
+				font-size: 16px;
+			}
+
+			.send-btn {
+				width: 80px;
+				height: 40px;
+				background-color: #40e9e0;
+				border: none;
+				border-radius: 20px;
+				cursor: pointer;
+				font-size: 16px;
+				color: #fff;
+				font-weight: 500;
+			}
+
+			.mask {
+				display: none;
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: rgba(0, 0, 0, 0.5);
+				z-index: 999;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.register-popup {
+				width: 900px;
+				height: 600px;
+				background: linear-gradient(90deg, #b7fff9, #ffffff);
+				border-radius: 20px;
+				padding: 30px 40px;
+				position: relative;
+			}
+
+			.popup-title {
+				text-align: center;
+				font-size: 32px;
+				margin-bottom: 30px;
+			}
+
+			.close-popup {
+				position: absolute;
+				top: 20px;
+				right: 30px;
+				font-size: 26px;
+				cursor: pointer;
+			}
+
+			.register-content {
+				display: flex;
+				justify-content: space-between;
+				align-items: flex-start;
+			}
+
+			.form-left {
+				font-size: 24px;
+				line-height: 1.8;
+			}
+
+			.form-left input {
+				font-size: 22px;
+				border: none;
+				background: transparent;
+				outline: none;
+				margin-left: 15px;
+				width: 240px;
+			}
+
+			.upload-box {
+				width: 240px;
+				height: 240px;
+				border: 4px solid #40e9e0;
+				border-radius: 8px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				font-size: 22px;
+				color: #666;
+				cursor: pointer;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.upload-tip {
+				font-size: 22px;
+				margin-bottom: 10px;
+			}
+
+			.plus-icon {
+				font-size: 40px;
+			}
+
+			.upload-box img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				position: absolute;
+				top: 0;
+				left: 0;
+			}
+
+			.submit-reg {
+				width: 160px;
+				height: 50px;
+				background: #40e9e0;
+				color: #fff;
+				border: none;
+				border-radius: 10px;
+				font-size: 22px;
+				cursor: pointer;
+				display: block;
+				margin-left: auto;
+				margin-top: 20px;
+			}
+
+			.highlight {
+				background-color: #ffeb3b;
+				transition: background 0.3s;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div class="top-header">
+			<div class="logo-title">《治愈维拉》</div>
+			<input type="text" class="search-bar" id="searchInput" placeholder="搜索页面内容...">
+			<div class="register-btn" onclick="openRegister()">注册心理咨询师</div>
+		</div>
+
+		<div class="container">
+			<div class="sidebar">
+				<div class="sidebar-item">首页</div>
+				<div class="sidebar-item active">心理咨询</div>
+				<div class="sidebar-item">心情记录</div>
+				<div class="sidebar-item">治愈vera</div>
+				<div class="sidebar-item">答案之书</div>
+				<div class="sidebar-item">心理测试</div>
+				<div class="sidebar-item">治愈工具</div>
+				<div class="sidebar-item">个人数据</div>
+			</div>
+
+			<div class="main-box" id="doctorListPage">
+				<h2 class="page-title">心理咨询师</h2>
+				<div class="doctor-grid" id="doctorGrid">
+					<div class="doctor-card" onclick="goChat('项鑫咨询师')">
+						<div class="avatar-box">
+							<img class="avatar-img" src="src/images/00.jpg">
+						</div>
+						<div class="doctor-info">
+							<p>项鑫 20</p>
+							<p>xx毕业 从业n年</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="chat-page" id="chatPage">
+				<div class="chat-header">
+					<span class="back-btn" onclick="backToList()">◀ 返回</span>
+					<span id="chatDoctorName">心理咨询师聊天</span>
+				</div>
+				<div class="chat-content" id="chatBox"></div>
+				<div class="chat-input-area">
+					<input class="chat-input" id="msgInput" placeholder="输入你想说的话...">
+					<button class="send-btn" onclick="sendMsg()">发送</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="mask" id="registerMask">
+			<div class="register-popup">
+				<span class="close-popup" onclick="closeRegister()">×</span>
+				<h3 class="popup-title">注册心理咨询师</h3>
+				<div class="register-content">
+					<div class="form-left">
+						<div>姓名：<input type="text" id="name"></div>
+						<div>年龄：<input type="text" id="age"></div>
+						<div>毕业院校：<input type="text" id="school"></div>
+						<div>从事工龄：<input type="text" id="workAge"></div>
+						<div>工作地址：<input type="text" id="address"></div>
+						<div>相关证书：<input type="text" id="cert"></div>
+						<div>实名认证：<input type="text" id="idCard"></div>
+					</div>
+					<div class="form-right">
+						<div class="upload-box" id="uploadBox" onclick="document.getElementById('fileInput').click()">
+							<div class="upload-tip">证件照</div>
+							<div class="plus-icon">+</div>
+							<input type="file" hidden id="fileInput" accept="image/*">
+						</div>
+					</div>
+				</div>
+				<button class="submit-reg" onclick="submitReg()">提交</button>
+			</div>
+		</div>
+
+		<script>
+			let currentDoctorName = '';
+			let uploadedImage = '';
+
+			function openRegister() {
+				document.getElementById('registerMask').style.display = 'flex';
+			}
+
+			function closeRegister() {
+				document.getElementById('registerMask').style.display = 'none';
+			}
+			document.getElementById('registerMask').onclick = function(e) {
+				if (e.target === this) closeRegister();
+			}
+			const fileInput = document.getElementById('fileInput');
+			const uploadBox = document.getElementById('uploadBox');
+			fileInput.onchange = function() {
+				const file = this.files[0];
+				if (!file) return;
+				uploadedImage = URL.createObjectURL(file);
+				uploadBox.innerHTML = `<img src="${uploadedImage}">`;
+			}
+
+			function submitReg() {
+				let name = document.getElementById('name').value.trim();
+				let age = document.getElementById('age').value.trim();
+				let school = document.getElementById('school').value.trim();
+				let workAge = document.getElementById('workAge').value.trim();
+				let address = document.getElementById('address').value.trim();
+				let cert = document.getElementById('cert').value.trim();
+				let idCard = document.getElementById('idCard').value.trim();
+				if (!name || !age || !school || !workAge || !address || !cert || !idCard) {
+					alert('请填写完整信息');
+					return;
+				}
+				if (!uploadedImage) {
+					alert('请上传证件照');
+					return;
+				}
+				alert("✅ 注册成功！已展示在咨询师列表");
+				let grid = document.getElementById('doctorGrid');
+				let card = document.createElement('div');
+				card.className = 'doctor-card';
+				card.onclick = () => goChat(name + '咨询师');
+				card.innerHTML = `
+					<div class="avatar-box">
+						<img class="avatar-img" src="${uploadedImage}">
+					</div>
+					<div class="doctor-info">
+						<p>${name} ${age}</p>
+						<p>${school} ${workAge}年</p>
+					</div>
+				`;
+				grid.appendChild(card);
+				closeRegister();
+			}
+
+			function goChat(name) {
+				currentDoctorName = name;
+				document.getElementById('chatDoctorName').innerText = `与${name}聊天中`;
+				document.getElementById('chatBox').innerHTML = '';
+				document.getElementById('doctorListPage').style.display = 'none';
+				document.getElementById('chatPage').style.display = 'flex';
+			}
+
+			function backToList() {
+				document.getElementById('chatPage').style.display = 'none';
+				document.getElementById('doctorListPage').style.display = 'block';
+			}
+
+			function sendMsg() {
+				let input = document.getElementById('msgInput');
+				let msg = input.value.trim();
+				if (!msg) return;
+				let chatBox = document.getElementById('chatBox');
+				chatBox.innerHTML += `<div class="msg-row user-msg"><div class="user-bubble">${msg}</div></div>`;
+				input.value = '';
+				chatBox.scrollTop = chatBox.scrollHeight;
+			}
+			document.getElementById('msgInput').addEventListener('keydown', e => {
+				if (e.key === 'Enter') sendMsg();
+			});
+
+			const pageMap = {
+				"首页": "zy.html",
+				"心理咨询": "xlzx.html",
+				"心情记录": "xqjl.html",
+				"治愈vera": "vera.html",
+				"答案之书": "dazs.html",
+				"心理测试": "xlcs.html",
+				"治愈工具": "zygj.html",
+				"个人数据": "grsj.html"
+			};
+			document.querySelectorAll('.sidebar-item').forEach(item => {
+				const text = item.innerText.trim();
+				if (pageMap[text] && text !== "心理咨询") {
+					item.addEventListener('click', () => {
+						location.href = pageMap[text];
+					});
+				}
+			});
+
+			// 搜索功能
+			function searchPage() {
+				const keyword = document.getElementById('searchInput').value.trim();
+				if (!keyword) return;
+				document.querySelectorAll('.highlight').forEach(el => el.classList.remove('highlight'));
+				const mainArea = document.querySelector('.main-box');
+				if (!mainArea) return;
+				const walker = document.createTreeWalker(mainArea, NodeFilter.SHOW_TEXT, {
+					acceptNode: (node) => {
+						if (node.parentElement.tagName === 'SCRIPT' || node.parentElement.tagName === 'STYLE')
+						return NodeFilter.FILTER_REJECT;
+						return NodeFilter.FILTER_ACCEPT;
+					}
+				});
+				let firstMatch = null;
+				while (walker.nextNode()) {
+					const node = walker.currentNode;
+					if (node.textContent.toLowerCase().includes(keyword.toLowerCase())) {
+						firstMatch = node.parentElement;
+						break;
+					}
+				}
+				if (firstMatch) {
+					firstMatch.classList.add('highlight');
+					firstMatch.scrollIntoView({
+						behavior: 'smooth',
+						block: 'center'
+					});
+				} else {
+					alert('未找到相关内容');
+				}
+			}
+			document.getElementById('searchInput').addEventListener('keypress', (e) => {
+				if (e.key === 'Enter') searchPage();
+			});
+		</script>
+	</body>
+</html>
